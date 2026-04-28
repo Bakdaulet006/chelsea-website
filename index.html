@@ -356,107 +356,32 @@ function showOnScroll() {
 window.addEventListener('scroll', showOnScroll);
 showOnScroll();
 </script>
-```html
-<!-- Chat Button -->
-<div id="chat-button">💬</div>
+<input id="msg" placeholder="Жаз..." />
+<button onclick="send()">Жіберу</button>
 
-<!-- Chat Box -->
-<div id="chat-box">
-  <div id="chat-header">Chelsea AI Chat</div>
-  <div id="chat-messages"></div>
-
-  <input type="text" id="user-input" placeholder="Type message..." />
-  <button onclick="sendMessage()">Send</button>
-</div>
-
-<style>
-#chat-button {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  background: blue;
-  color: green;
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  cursor: pointer;
-  font-size: 30px;
-}
-
-#chat-box {
-  display: none;
-  position: fixed;
-  bottom: 90px;
-  right: 20px;
-  width: 300px;
-  background: green;
-  border: 1px solid #ccc;
-  border-radius: 10px;
-  overflow: hidden;
-}
-
-#chat-header {
-  background: blue;
-  color: green;
-  padding: 10px;
-}
-
-#chat-messages {
-  height: 250px;
-  padding: 10px;
-  overflow-y: auto;
-}
-
-#user-input {
-  width: 70%;
-  padding: 10px;
-}
-
-button {
-  width: 25%;
-  padding: 10px;
-}
-</style>
+<div id="chat"></div>
 
 <script>
-const chatButton = document.getElementById("chat-button");
-const chatBox = document.getElementById("chat-box");
+async function send() {
+    const message = document.getElementById("msg").value;
 
-chatButton.onclick = () => {
-  chatBox.style.display =
-    chatBox.style.display === "block" ? "none" : "block";
-};
+    const res = await fetch("https://bakdaulet.daurenbakdaulet077.workers.dev", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ message })
+    });
 
-function sendMessage() {
-  const input = document.getElementById("user-input");
-  const messages = document.getElementById("chat-messages");
+    const data = await res.json();
 
-  const userText = input.value;
-
-  if (userText.trim() === "") return;
-
-  messages.innerHTML += `<p><b>You:</b> ${userText}</p>`;
-
-  let botReply = "I am Chelsea bot 💙";
-
-  if (userText.toLowerCase().includes("chelsea")) {
-    botReply = "Chelsea is the best football club!";
-  }
-
-  if (userText.toLowerCase().includes("hello")) {
-    botReply = "Hello friend 👋";
-  }
-
-  messages.innerHTML += `<p><b>Bot:</b> ${botReply}</p>`;
-
-  input.value = "";
+    document.getElementById("chat").innerHTML += `
+        <p><b>Сен:</b> ${message}</p>
+        <p><b>Bot:</b> ${data.reply}</p>
+        <hr>
+    `;
 }
 </script>
-```
-
 </body>
 </html>
 
