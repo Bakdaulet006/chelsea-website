@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Следующие матчи Челси</title>
+<style>
+  
+  body {
+    font-family: Arial, sans-serif;
+    background: #001a33;
+    color: #fff;
+    text-align: center;
+    padding: 20px;
+    
+  }
+  
+  h1 {
+    margin-bottom: 30px;
+    color: #ffcc00;
+  }
+  .match-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(135deg, #003399, #0055cc);
+    padding: 20px;
+    margin: 20px auto;
+    border-radius: 15px;
+    max-width: 600px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.5);
+  }
+  .team {
+    font-size: 1.5em;
+    font-weight: bold;
+    width: 40%;
+  }
+  .timer {
+    font-size: 1.3em;
+    font-weight: bold;
+    color: #ff0;
+    width: 20%;
+  }
+</style>
+</head>
+<body>
+
+<h1>Следующие матчи Челси</h1>
+
+<div class="match-card">
+  <div class="team">Челси</div>
+  <div class="timer" data-date="2025-11-22T17:30:00+06:00">Загрузка...</div>
+  <div class="team">Бёрнли</div>
+</div>
+
+<div class="match-card">
+  <div class="team">Челси</div>
+  <div class="timer" data-date="2025-11-26T01:00:00+06:00">Загрузка...</div>
+  <div class="team">Барселона</div>
+</div>
+
+<script>
+// ===== Таймер для всех матчей =====
+function startTimers() {
+  const timers = document.querySelectorAll(".timer");
+
+  timers.forEach(timerEl => {
+    const targetDate = new Date(timerEl.getAttribute("data-date")).getTime();
+
+    const interval = setInterval(() => {
+      const now = new Date().getTime();
+      const distance = targetDate - now;
+
+      if (distance <= 0) {
+        clearInterval(interval);
+        timerEl.innerHTML = "Матч начался!";
+        return;
+      }
+
+      const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+      timerEl.innerHTML = `${days}д ${hours}ч ${minutes}м ${seconds}с`;
+    }, 1000);
+  });
+}
+
+// Запуск таймеров после загрузки страницы
+window.addEventListener('DOMContentLoaded', startTimers);
+</script>
+<!-- 🔹 Кнопка "Домой" -->
+<div style="text-align: center; margin-top: 15px;">
+    <a href="index.html" 
+       style="background-color: #003399; 
+              color: white; 
+              padding: 10px 20px; 
+              border-radius: 25px; 
+              text-decoration: none; 
+              font-weight: bold; 
+              transition: background 0.3s;">
+       ⬅️ Домой
+    </a>
+</div>
+
+</body>
+</html>

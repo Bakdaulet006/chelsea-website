@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Вход | Chelsea Fan Club</title>
+<style>
+body {
+    background: linear-gradient(180deg, #001a66, #0044cc);
+    color: white;
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+.container {
+    background: rgba(255,255,255,0.1);
+    padding: 30px;
+    border-radius: 20px;
+    width: 300px;
+    text-align: center;
+}
+input {
+    width: 90%;
+    padding: 8px;
+    margin: 8px 0;
+    border: none;
+    border-radius: 6px;
+}
+button {
+    background: #ffd700;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 20px;
+    cursor: pointer;
+}
+.error { color: red; }
+</style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Вход</h2>
+    <input type="email" id="email" placeholder="Email"><br>
+    <input type="password" id="password" placeholder="Пароль"><br>
+    <button onclick="login()">Войти</button>
+    <p id="err"></p>
+</div>
+
+<script>
+function login() {
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value;
+
+    const users = JSON.parse(localStorage.getItem("chelsea_users")) || [];
+    const user = users.find(u => u.email === email && u.password === password);
+
+    if (user) {
+        alert(`Добро пожаловать, ${user.name}!`);
+        window.location.href = "index.html"; // переход после логина
+    } else {
+        document.getElementById("err").innerHTML = "<span class='error'>❌ Неверный email или пароль</span>";
+    }
+}
+</script>
+
+</body>
+</html>

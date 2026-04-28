@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chelsea Fan Store | Наши товары</title>
+<style>
+/* === Общий стиль страницы === */
+body {
+    background: linear-gradient(180deg, #001a66, #0044cc);
+    font-family: 'Segoe UI', sans-serif;
+    color: white;
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    background-color: #002b80;
+    text-align: center;
+    padding: 20px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+}
+
+header h1 {
+    margin: 0;
+    font-size: 2em;
+    letter-spacing: 1px;
+}
+
+.products-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 25px;
+    padding: 40px;
+}
+
+/* === Карточка товара === */
+.product-card {
+    background-color: rgba(255,255,255,0.1);
+    border-radius: 15px;
+    text-align: center;
+    padding: 20px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.product-card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 20px rgba(255,255,255,0.3);
+}
+
+/* === Слайдер === */
+.slider {
+    position: relative;
+    width: 100%;
+    height: 200px;
+    overflow: hidden;
+    border-radius: 12px;
+}
+
+.slider img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    display: none;
+}
+
+.slider img.active {
+    display: block;
+}
+
+.slider button {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(0,0,0,0.4);
+    color: white;
+    border: none;
+    padding: 6px 10px;
+    cursor: pointer;
+    border-radius: 50%;
+    font-size: 18px;
+    transition: background 0.3s;
+}
+
+.slider button:hover {
+    background: rgba(0,0,0,0.7);
+}
+
+.prev { left: 5px; }
+.next { right: 5px; }
+
+/* === Название, цена и кнопка === */
+.product-name {
+    margin: 15px 0 5px;
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+.product-price {
+    color: #ffd700;
+    font-size: 1.1em;
+    margin-bottom: 10px;
+}
+
+.buy-btn {
+    background-color: #003399;
+    color: white;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.buy-btn:hover {
+    background-color: #0055ff;
+}
+
+/* === Подвал === */
+footer {
+    text-align: center;
+    background-color: #002266;
+    padding: 15px;
+    margin-top: 30px;
+    font-size: 0.9em;
+    color: #b3c6ff;
+}
+</style>
+</head>
+<body>
+<header>
+    <h1>Наши товары Chelsea</h1>
+</header>
+<!-- Таймер с текстом сверху -->
+<div style="text-align: center; margin: 20px 0;">
+  <div style="font-size: 1.5em; margin-bottom: 10px; color: #ff0;">🔥 Черная Пятница! Скидка 30% на все товары! 🔥</div>
+  <div id="countdown" style="
+        display: inline-block;
+        padding: 15px 30px;
+        font-size: 2em;
+        color: #fff;
+        background: linear-gradient(135deg, #ff4d4d, #ff0000);
+        border-radius: 15px;
+        box-shadow: 0 0 20px rgba(28, 26, 181, 0.6);
+        font-weight: bold;
+        letter-spacing: 2px;
+        transition: all 0.3s ease;
+      ">
+    Загрузка таймера...
+  </div>
+</div>
+
+<script>
+// ===== Таймер обратного отсчёта =====
+const countdownEl = document.getElementById("countdown");
+const targetDate = new Date("November 29, 2025 00:00:00").getTime();
+
+const timerInterval = setInterval(() => {
+  const now = new Date().getTime();
+  const distance = targetDate - now;
+
+  if (distance <= 0) {
+    clearInterval(timerInterval);
+    countdownEl.innerHTML = "Продажа завершена.";
+    countdownEl.style.background = "#555";
+    countdownEl.style.boxShadow = "0 0 10px rgba(0,0,0,0.5)";
+    return;
+  }
+
+  const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+  const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+  const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+  const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+  countdownEl.innerHTML = `${days}д ${hours}ч ${minutes}м ${seconds}с`;
+}, 1000);
+
+
+// ===== Применение скидки 30% к товарам =====
+function applyDiscount() {
+  const prices = document.querySelectorAll(".product-price");
+  prices.forEach(priceEl => {
+    // Убираем все символы кроме цифр
+    let originalPrice = parseFloat(priceEl.innerText.replace(/[^0-9]/g, ''));
+    if (!isNaN(originalPrice)) {
+      let discountedPrice = Math.round(originalPrice * 0.7);
+      // Обновляем текст с валютой
+      priceEl.innerText = `₸${discountedPrice.toLocaleString()}`;
+    }
+  });
+}
+
+// ===== Применение скидки 30% ко всем товарам =====
+function applyDiscount() {
+  const prices = document.querySelectorAll(".product-price");
+  prices.forEach(priceEl => {
+    // Получаем оригинальную цену (только цифры)
+    let originalPrice = parseFloat(priceEl.innerText.replace(/[^0-9]/g, ''));
+    if (!isNaN(originalPrice)) {
+      let discountedPrice = Math.round(originalPrice * 0.7); // 30% скидка
+
+      // Заменяем текст на зачеркнутую старую цену + новую цену
+      priceEl.innerHTML = `<span style="text-decoration: line-through; color: #aaa;">₸${originalPrice.toLocaleString()}</span> 
+                           <span style="color: #ff0; font-weight: bold;">₸${discountedPrice.toLocaleString()}</span>`;
+    }
+  });
+}
+
+// Применяем скидку сразу после загрузки страницы
+window.addEventListener('DOMContentLoaded', applyDiscount);
+</script>
+
+</script>
+
+
+
+</script>
+
+<!-- 🔹 Кнопка "Домой" -->
+<div style="text-align: center; margin-top: 15px;">
+    <a href="index.html" 
+       style="background-color: #003399; 
+              color: white; 
+              padding: 10px 20px; 
+              border-radius: 25px; 
+              text-decoration: none; 
+              font-weight: bold; 
+              transition: background 0.3s;">
+       ⬅️ Домой
+    </a>
+</div>
+
+<header>
+    <h1>Наши товары Chelsea</h1>
+</header>
+
+<main>
+    <div class="products-container">
+
+        <!-- === Футболка === -->
+        <div class="product-card">
+            <div class="slider">
+                <img src="C:\Users\Aidyn\Desktop\Chelsea.Website\mceclip0-1721847333804.jpg" alt="Футболка Chelsea вид 1" class="active">
+                <img src="C:\Users\Aidyn\Desktop\Chelsea.Website\images (6).jpg" alt="Футболка Chelsea вид 2">
+                <img src="C:\Users\Aidyn\Desktop\Chelsea.Website\images (7).jpg" alt="Футболка Chelsea вид 3">
+                <button class="prev" onclick="changeSlide(-1, this)">❮</button>
+                <button class="next" onclick="changeSlide(1, this)">❯</button>
+            </div>
+            <div class="product-name">Футболка Chelsea 2025</div>
+            <div class="product-price">₸12,000</div>
+            <div class="product-coment">Футболка из шеклка для фантаов</div>
+            <button class="buy-btn" onclick="alert('Добавлено в корзину!')">Купить</button>
+        </div>
+
+        <!-- === Кепка === -->
+        <div class="product-card">
+            <div class="slider">
+                <img src="C:\Users\Aidyn\Desktop\Chelsea.Website\6571609162.webp" class="active" alt="Кепка Chelsea вид 1">
+                <img src="C:\Users\Aidyn\Desktop\Chelsea.Website\6571609136.webp" alt="Кепка Chelsea вид 2">
+                <img src="C:\Users\Aidyn\Desktop\Chelsea.Website\6625482159.webp" alt="Кепка Chelsea вид 3">
+                <button class="prev" onclick="changeSlide(-1, this)">❮</button>
+                <button class="next" onclick="changeSlide(1, this)">❯</button>
+            </div>
+            <div class="product-name">Кепка Chelsea</div>
+            <div class="product-price">₸6,000</div>
+            <div class="product-coment">Кепка  с логотипом ФК Челси</div>
+            <button class="buy-btn" onclick="alert('Добавлено в корзину!')">Купить</button>
+        </div>
+<!-- === Шарф === -->
+        <div class="product-card">
+            <div class="slider">
+                <img src="C:\Users\Aidyn\Desktop\Chelsea.Website\1013618941.webp" class="active" alt="Шарф Chelsea вид 1">
+                <img src="C:\Users\Aidyn\Desktop\Chelsea.Website\1013618942.webp" alt="Шарф Chelsea вид 2">
+                <img src="C:\Users\Aidyn\Desktop\Chelsea.Website\10dc926253f1927b0218bc51a53b234733f0183a_original.jpeg" alt="Шарф Chelsea вид 3">
+                <button class="prev" onclick="changeSlide(-1, this)">❮</button>
+                <button class="next" onclick="changeSlide(1, this)">❯</button>
+            </div>
+            <div class="product-name">Шарф Chelsea</div>
+            <div class="product-price">₸4,500</div>
+            <div class="product-coment">Шарф из теплого материала и хороешго качества слогтипом Челси</div>
+            <button class="buy-btn" onclick="alert('Добавлено в корзину!')">Купить</button>
+        </div>
+
+        <!-- === Шорты === -->
+        <div class="product-card">
+            <div class="slider">
+                <img src="C:\Users\Aidyn\Desktop\Chelsea.Website\7841579459.webp" class="active" alt="Шорты Chelsea вид 1">
+                <img src="C:\Users\Aidyn\Desktop\Chelsea.Website\7841579518.webp" alt="Шорты Chelsea вид 2">
+                <img src="C:\Users\Aidyn\Desktop\Chelsea.Website\7841579485.webp" alt="Шорты Chelsea вид 3">
+                <button class="prev" onclick="changeSlide(-1, this)">❮</button>
+                <button class="next" onclick="changeSlide(1, this)">❯</button>
+            </div>
+            <div class="product-name">Шорты Chelsea</div>
+            <div class="product-price">₸8,000</div>
+            <div class="product-coment">Шорты тренеровочные с логотипом Селси из хлопка</div>
+            <button class="buy-btn" onclick="alert('Добавлено в корзину!')">Купить</button>
+        </div>
+
+        <!-- === Спортивки === -->
+        <div class="product-card">
+            <div class="slider">
+                <img src="C:\Users\Aidyn\Desktop\Chelsea.Website\7156003079.webp" class="active" alt="Спортивные штаны Chelsea вид 1">
+                <img src="C:\Users\Aidyn\Desktop\Chelsea.Website\7156003039.webp" alt="Спортивные штаны Chelsea вид 2">
+                <img src="C:\Users\Aidyn\Desktop\Chelsea.Website\7156003061.webp" alt="Спортивные штаны Chelsea вид 3">
+                <button class="prev" onclick="changeSlide(-1, this)">❮</button>
+                <button class="next" onclick="changeSlide(1, this)">❯</button>
+            </div>
+            <div class="product-name">Спортивные штаны Chelsea</div>
+            <div class="product-price">₸10,000</div>
+            <div class="product-coment">Спротивка двойка слоготипом челси из хоршего материала</div>
+            <button class="buy-btn" onclick="alert('Добавлено в корзину!')">Купить</button>
+        </div>
+
+        <!-- === Тёплая куртка === -->
+        <div class="product-card">
+            <div class="slider">
+                <img src="C:\Users\Aidyn\Desktop\Chelsea.Website\dm0606_495_2_web.jpg" class="active" alt="Куртка Chelsea вид 1">
+                <img src="C:\Users\Aidyn\Desktop\Chelsea.Website\dm0606_495_1_web.jpg" alt="Куртка Chelsea вид 2">
+                <img src="C:\Users\Aidyn\Desktop\Chelsea.Website\dm0606_495_6_web.jpg" alt="Куртка Chelsea вид 3">
+                <button class="prev" onclick="changeSlide(-1, this)">❮</button>
+                <button class="next" onclick="changeSlide(1, this)">❯</button>
+            </div>
+            <div class="product-name">Тёплая куртка Chelsea</div>
+            <div class="product-price">₸25,000</div>
+            <div class="product-coment">Теплая куртка свышеовкой с логотипом челси из теплого материала</div>
+            <button class="buy-btn" onclick="alert('Добавлено в корзину!')">Купить</button>
+        </div>
+        <!-- === Мяч Chelsea === -->
+<div class="product-card">
+    <div class="slider">
+        <img src="C:\Users\Aidyn\Desktop\Chelsea.Website\6471154686.webp" class="active" alt="Мяч Chelsea вид 1">
+        <img src="C:\Users\Aidyn\Desktop\Chelsea.Website\6471154685.webp" alt="Мяч Chelsea вид 2">
+        <img src="C:\Users\Aidyn\Desktop\Chelsea.Website\6471154684.webp" alt="Мяч Chelsea вид 3">
+        <button class="prev" onclick="changeSlide(-1, this)">❮</button>
+        <button class="next" onclick="changeSlide(1, this)">❯</button>
+    </div>
+    <div class="product-name">Мяч Chelsea</div>
+    <div class="product-price">₸15,000</div>
+    <div class="product-coment">Мяч с логтипом челси для игры футбол</div>
+    <button class="buy-btn" onclick="alert('Добавлено в корзину!')">Купить</button>
+</div>
+
+<!-- === Бутылка Chelsea === -->
+<div class="product-card">
+    <div class="slider">
+        <img src="C:\Users\Aidyn\Desktop\Chelsea.Website\7571110258.webp" class="active" alt="Бутылка Chelsea вид 1">
+        <img src="C:\Users\Aidyn\Desktop\Chelsea.Website\7571110260.webp" alt="Бутылка Chelsea вид 2">
+        <img src="C:\Users\Aidyn\Desktop\Chelsea.Website\7571110265.webp" alt="Бутылка Chelsea вид 3">
+        <button class="prev" onclick="changeSlide(-1, this)">❮</button>
+        <button class="next" onclick="changeSlide(1, this)">❯</button>
+    </div>
+    <div class="product-name">Бутылка Chelsea</div>
+    <div class="product-price">₸5,000</div>
+    <div class="product-coment">Бутылка слогтиом челси для ежедневных тренеровок</div>
+    <button class="buy-btn" onclick="alert('Добавлено в корзину!')">Купить</button>
+</div>
+
+
+<!-- === Флаг Chelsea === -->
+<div class="product-card">
+    <div class="slider">
+        <img src="C:\Users\Aidyn\Desktop\Chelsea.Website\6655409064.webp" class="active" alt="Флаг Chelsea вид 1">
+        <img src="C:\Users\Aidyn\Desktop\Chelsea.Website\6655409066.webp" alt="Флаг Chelsea вид 2">
+        <img src="C:\Users\Aidyn\Desktop\Chelsea.Website\7289418917.webp" alt="Флаг Chelsea вид 3">
+        <button class="prev" onclick="changeSlide(-1, this)">❮</button>
+        <button class="next" onclick="changeSlide(1, this)">❯</button>
+    </div>
+    <div class="product-name">Флаг Chelsea</div>
+    <div class="product-price">₸7,000</div>
+    <div class="product-coment">Флаг Челси 120Х90 для развешивание стен</div>
+    <button class="buy-btn" onclick="alert('Добавлено в корзину!')">Купить</button>
+</div>
+
+<!-- === Тренировочная форма Chelsea === -->
+<div class="product-card">
+    <div class="slider">
+        <img src="C:\Users\Aidyn\Desktop\Chelsea.Website\6942795282.webp" class="active" alt="Тренировочная форма Chelsea вид 1">
+        <img src="C:\Users\Aidyn\Desktop\Chelsea.Website\6942795214.webp" alt="Тренировочная форма Chelsea вид 2">
+        <img src="C:\Users\Aidyn\Desktop\Chelsea.Website\6942795217.webp" alt="Тренировочная форма Chelsea вид 3">
+        <button class="prev" onclick="changeSlide(-1, this)">❮</button>
+        <button class="next" onclick="changeSlide(1, this)">❯</button>
+    </div>
+    <div class="product-name">Тренировочная форма Chelsea</div>
+    <div class="product-price">₸18,000</div>
+    <div class="product-coment">Тренировочная форма челси из хлопка для ежедневных тренеровок</div>
+    <button class="buy-btn" onclick="alert('Добавлено в корзину!')">Купить</button>
+
+
+<script>
+
+
+
+
+<div id="products" class="grid"></div>
+
+</script>
+
+
+    </div>
+</main>
+
+<footer>
+    © 2025 Chelsea Fan Store | Все права защищены
+</footer>
+
+<script>
+/* === Функция смены слайда === */
+function changeSlide(direction, button) {
+    const slider = button.parentElement;
+    const images = slider.querySelectorAll('img');
+    let current = Array.from(images).findIndex(img => img.classList.contains('active'));
+    images[current].classList.remove('active');
+    let next = current + direction;
+    if (next >= images.length) next = 0;
+    if (next < 0) next = images.length - 1;
+    images[next].classList.add('active');
+}
+
+
+</script><!-- === 🛒 Всплывающая корзина === -->
+<div id="cart-modal" class="cart-modal">
+  <div class="cart-content">
+    <button class="close-btn">×</button>
+    <h2>🛒 Ваша корзина</h2>
+    <div id="cart-items"></div>
+    <div class="cart-footer">
+      <h3>Общая сумма: <span id="cart-total">0</span> ₸</h3>
+      <button class="checkout-btn">Оформить заказ</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// === Добавляем кнопку корзины в верхний header ===
+const header = document.querySelector('header');
+const cartBtn = document.createElement('button');
+cartBtn.textContent = '🛒 Корзина';
+cartBtn.classList.add('cart-toggle-btn');
+header.appendChild(cartBtn);
+
+const modal = document.getElementById('cart-modal');
+const closeBtn = document.querySelector('.close-btn');
+
+// === Анимация открытия/закрытия ===
+cartBtn.addEventListener('click', () => {
+  modal.classList.add('show');
+});
+closeBtn.addEventListener('click', () => {
+  modal.classList.remove('show');
+});
+
+// === ООП ===
+class Product {
+  constructor(name, price, img) {
+    this.name = name;
+    this.price = price;
+    this.img = img;
+  }
+}
+
+class CartItem {
+  constructor(product, quantity = 1) {
+    this.product = product;
+    this.quantity = quantity;
+  }
+  get totalPrice() {
+    return this.product.price * this.quantity;
+  }
+}
+
+class Cart {
+  constructor() {
+    this.items = [];
+  }
+
+  addProduct(product) {
+    const existing = this.items.find(i => i.product.name === product.name);
+    if (existing) existing.quantity++;
+    else this.items.push(new CartItem(product));
+    this.render();
+    this.animateCartIcon();
+  }
+
+  updateQuantity(name, delta) {
+    const item = this.items.find(i => i.product.name === name);
+    if (!item) return;
+    item.quantity += delta;
+    if (item.quantity <= 0) this.removeProduct(name);
+    this.render();
+  }
+
+  removeProduct(name) {
+    const index = this.items.findIndex(i => i.product.name === name);
+    if (index !== -1) {
+      const element = document.querySelectorAll('.cart-item')[index];
+      element.classList.add('fade-out');
+      setTimeout(() => {
+        this.items.splice(index, 1);
+        this.render();
+      }, 300);
+    }
+  }
+
+  getTotal() {
+    return this.items.reduce((sum, i) => sum + i.totalPrice, 0);
+  }
+
+  render() {
+    const container = document.getElementById('cart-items');
+    container.innerHTML = '';
+
+    if (this.items.length === 0) {
+      container.innerHTML = '<p class="empty-cart">Корзина пуста 😔</p>';
+    } else {
+      this.items.forEach(item => {
+        const div = document.createElement('div');
+        div.classList.add('cart-item');
+        div.innerHTML = `
+          <img src="${item.product.img}" alt="${item.product.name}">
+          <div class="info">
+            <span class="name">${item.product.name}</span>
+            <span class="price">${item.product.price} ₸</span>
+          </div>
+          <div class="qty-control">
+            <button class="qty-btn minus">−</button>
+            <span class="qty-val">${item.quantity}</span>
+            <button class="qty-btn plus">+</button>
+          </div>
+          <span class="total">${item.totalPrice} ₸</span>
+          <button class="delete-btn">🗑</button>
+        `;
+
+        div.querySelector('.minus').addEventListener('click', () => this.updateQuantity(item.product.name, -1));
+        div.querySelector('.plus').addEventListener('click', () => this.updateQuantity(item.product.name, +1));
+        div.querySelector('.delete-btn').addEventListener('click', () => this.removeProduct(item.product.name));
+
+        container.appendChild(div);
+
+        // Анимация появления нового товара
+        div.classList.add('pop-in');
+      });
+    }
+    document.getElementById('cart-total').textContent = this.getTotal();
+  }
+
+  animateCartIcon() {
+    cartBtn.classList.add('bounce');
+    setTimeout(() => cartBtn.classList.remove('bounce'), 500);
+  }
+}
+
+// === Инициализация корзины ===
+const cart = new Cart();
+
+// === Привязка к кнопкам "Купить" ===
+document.querySelectorAll('.product-card').forEach(card => {
+  const name = card.querySelector('.product-name').textContent;
+  const priceText = card.querySelector('.product-price').textContent.replace(/[₸, ]/g, '');
+  const price = parseInt(priceText);
+  const img = card.querySelector('.slider img').src;
+  const button = card.querySelector('.buy-btn');
+
+  button.addEventListener('click', () => {
+    const product = new Product(name, price, img);
+    cart.addProduct(product);
+    button.textContent = '✅ В корзине';
+    setTimeout(() => (button.textContent = 'Купить'), 1500);
+  });
+});
+</script>
+
+<style>
+/* === Кнопка корзины === */
+.cart-toggle-btn {
+  background: linear-gradient(45deg, #ffd700, #ffb800);
+  color: #001a66;
+  border: none;
+  border-radius: 25px;
+  padding: 10px 18px;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 1.1em;
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.4);
+  transition: transform 0.2s ease, box-shadow 0.3s;
+}
+.cart-toggle-btn:hover {
+  transform: scale(1.08);
+  box-shadow: 0 0 15px rgba(255, 215, 0, 0.7);
+}
+.cart-toggle-btn.bounce {
+  animation: bounce 0.4s ease;
+}
+
+/* === Всплывающая корзина === */
+.cart-modal {
+  display: none;
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.6);
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+  opacity: 0;
+  transition: all 0.4s ease;
+}
+.cart-modal.show {
+  display: flex;
+  opacity: 1;
+}
+.cart-content {
+  background: linear-gradient(145deg, #002b80, #001a66);
+  color: white;
+  padding: 25px;
+  border-radius: 25px;
+  width: 550px;
+  max-height: 85vh;
+  overflow-y: auto;
+  box-shadow: 0 0 25px rgba(255,255,255,0.3);
+  transform: scale(0.8);
+  transition: all 0.4s ease;
+}
+.cart-modal.show .cart-content {
+  transform: scale(1);
+}
+.close-btn {
+  position: absolute;
+  top: 10px; right: 15px;
+  background: red;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  font-size: 22px;
+  width: 35px; height: 35px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+.close-btn:hover {
+  background: #ff5050;
+  transform: rotate(90deg);
+}
+
+/* === Товары в корзине === */
+.cart-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(255,255,255,0.1);
+  margin: 10px 0;
+  padding: 10px;
+  border-radius: 12px;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+.cart-item img {
+  width: 70px;
+  height: 70px;
+  border-radius: 10px;
+  object-fit: cover;
+}
+.cart-item .info {
+  flex: 1;
+  margin-left: 10px;
+}
+.qty-btn {
+  background: #ffd700;
+  color: #001a66;
+  border: none;
+  border-radius: 5px;
+  width: 30px;
+  height: 30px;
+  font-weight: bold;
+  font-size: 18px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+.qty-btn:hover {
+  background: #fff06b;
+}
+.delete-btn {
+  background: transparent;
+  color: #ff8080;
+  border: none;
+  font-size: 22px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+.delete-btn:hover {
+  transform: scale(1.2);
+}
+
+/* === Анимации === */
+@keyframes bounce {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+.pop-in {
+  animation: popIn 0.4s ease;
+}
+@keyframes popIn {
+  0% { opacity: 0; transform: scale(0.8); }
+  100% { opacity: 1; transform: scale(1); }
+}
+.fade-out {
+  opacity: 0;
+  transform: translateX(30px);
+}
+
+/* === Пустая корзина === */
+.empty-cart {
+  text-align: center;
+  color: #ccc;
+  font-size: 1.1em;
+  margin-top: 20px;
+}
+
+/* === Нижняя часть корзины === */
+.cart-footer {
+  text-align: center;
+  margin-top: 15px;
+}
+.checkout-btn {
+  background: #00cc88;
+  border: none;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 0.3s;
+  font-size: 1em;
+  font-weight: bold;
+}
+.checkout-btn:hover {
+  background: #00ffaa;
+  transform: scale(1.05);
+}
+</style>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+
+  // 🔑 ЕДИНСТВЕННЫЙ ПРАВИЛЬНЫЙ КЛЮЧ
+  const products = JSON.parse(
+    localStorage.getItem("chelsea_products_v2") || "[]"
+  );
+
+  console.log("Товары из LS:", products); // 🔍 для проверки
+
+  const container = document.querySelector(".products-container");
+  if (!container) {
+    console.error("❌ .products-container не найден");
+    return;
+  }
+
+  // ❌ НЕ очищаем container.innerHTML — старые товары остаются
+
+  products.forEach(p => {
+    const card = document.createElement("div");
+    card.className = "product-card";
+
+    card.innerHTML = `
+      ${p.image ? `
+        <img 
+          src="${p.image}" 
+          alt="${p.title || p.name || 'Товар'}"
+          style="width:100%; height:200px; object-fit:cover; border-radius:12px;"
+        >
+      ` : ""}
+
+      <div class="product-name">${p.title || p.name || "Без названия"}</div>
+      <div class="product-price">₸${p.price}</div>
+      <div class="product-coment">${p.desc || p.description || ""}</div>
+      <button class="buy-btn">Купить</button>
+    `;
+
+    container.appendChild(card); // ❗ ОБЯЗАТЕЛЬНО
+  });
+
+});
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+
+  // 🔑 читаем товары из админки
+  const products = JSON.parse(
+    localStorage.getItem("chelsea_products_v2") || "[]"
+  );
+
+  const container = document.querySelector(".products-container");
+  if (!container) return;
+
+  // ✅ ДОБАВЛЯЕМ товары, а не очищаем контейнер
+  products.forEach(p => {
+    const card = document.createElement("div");
+    card.className = "product-card";
+
+    card.innerHTML = `
+      <div class="product-name">${p.title || p.name}</div>
+      <div class="product-price">₸${p.price}</div>
+      <div class="product-coment">${p.desc || p.description || ""}</div>
+      <p>В наличии: ${p.stock ?? 0}</p>
+      <button class="buy-btn">Купить</button>
+    `;
+
+    container.appendChild(card); // 👈 ВАЖНО
+  });
+
+});
+</script>
+
+
+
+</body>
+</html>

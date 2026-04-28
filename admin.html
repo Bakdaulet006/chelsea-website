@@ -1,0 +1,468 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Admin Panel — Chelsea Fan Site</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/modern-normalize/1.1.0/modern-normalize.min.css">
+  <style>
+    :root{--bg:#07123a;--card:#071536;--accent:#0347a1;--muted:#9fb3d8;--glass: rgba(255,255,255,0.03)}
+    body{font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; background: linear-gradient(180deg,#02102a 0%, #061330 100%); color:#e6eef8; margin:0;}
+    .app{display:flex; min-height:100vh}
+    .sidebar{width:270px; background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); padding:20px; box-shadow:2px 0 12px rgba(2,6,23,0.6)}
+    .brand{font-weight:800; font-size:18px; margin-bottom:18px; color:#9fd1ff}
+    .nav{list-style:none; padding:0; margin:0}
+    .nav li{margin:8px 0}
+    .nav a{color:var(--muted); text-decoration:none; display:flex; gap:10px; align-items:center; padding:10px; border-radius:8px}
+    .nav a.active, .nav a:hover{background:var(--glass); color:#fff}
+    .main{flex:1; padding:28px}
+    .top{display:flex; justify-content:space-between; align-items:center; margin-bottom:20px}
+    .card-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-bottom:20px}
+    .card{background:var(--card); padding:16px; border-radius:12px; box-shadow: 0 6px 18px rgba(2,6,23,0.6)}
+    table{width:100%; border-collapse:collapse}
+    th, td{padding:10px; text-align:left; border-bottom:1px solid rgba(255,255,255,0.03); color:#dbeafe}
+    .btn{background:var(--accent); color:white; border:none; padding:8px 12px; border-radius:8px; cursor:pointer}
+    .btn.ghost{background:transparent; border:1px solid rgba(255,255,255,0.06)}
+    .form-row{display:flex; gap:10px; margin-bottom:10px}
+    input,textarea,select{background:transparent; border:1px solid rgba(255,255,255,0.06); color: #e6eef8; padding:8px; border-radius:6px; width:100%}
+    .center{display:flex; align-items:center; justify-content:center}
+    .login-panel{max-width:420px; margin:60px auto; background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); padding:28px; border-radius:12px}
+    .small{font-size:13px; color:var(--muted)}
+    .table-actions{display:flex; gap:8px}
+    .search{min-width:200px}
+    @media (max-width:900px){.card-grid{grid-template-columns:repeat(1,1fr)} .sidebar{display:none} }
+  </style>
+</head>
+<body>
+  <!-- Chelsea-themed single-file React admin panel. Place this file at /admin/index.html and link to it from your site. -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Admin Panel | Chelsea</title>
+<style>
+body {
+    background: #001a66;
+    font-family: Arial, sans-serif;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+.form-container {
+    background: rgba(255,255,255,0.1);
+    padding: 30px;
+    border-radius: 20px;
+    text-align: center;
+}
+input {
+    width: 90%;
+    padding: 10px;
+    margin: 8px 0;
+    border-radius: 8px;
+    border: none;
+}
+button {
+    background: #ffd700;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: bold;
+}
+button:hover { background: #ffea70; }
+.error { color: red; }
+</style>
+</head>
+<body>
+
+<div class="form-container">
+    <h2>Admin Login</h2>
+    <input type="text" id="adminUser" placeholder="Логин"><br>
+    <input type="password" id="adminPass" placeholder="Пароль"><br>
+    <button onclick="loginAdmin()">Войти</button>
+    <p id="err" class="error"></p>
+
+
+
+<script>
+function loginAdmin() {
+    const user = document.getElementById("adminUser").value.trim();
+    const pass = document.getElementById("adminPass").value;
+
+    // Предопределённый логин/пароль администратора
+    const ADMIN_LOGIN = "admin";
+    const ADMIN_PASS = "1113";
+
+    if(user === ADMIN_LOGIN && pass === ADMIN_PASS){
+        // Сохраняем, что админ вошёл
+        localStorage.setItem("isAdmin", "true");
+        // Переходим на главную админки
+        window.location.href = "dashboard.html"; 
+    } else {
+        document.getElementById("err").innerText = "❌ Неверный логин или пароль";
+    }
+}
+</script>
+
+
+</body>
+</html>
+
+  <div id="root"></div>
+
+  <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+
+  <script type="text/babel">
+  const {useState, useEffect} = React;
+
+  // --- Config / "fake server" ---
+  const CREDENTIALS = { username: 'admin', password: 'password123' };
+  const LS_KEYS = { products: 'chelsea_products_v1', users: 'chelsea_users_v1', auth: 'chelsea_auth_v1', changes: 'chelsea_changes_v1' };
+
+  function seedIfEmpty(){
+    if(!localStorage.getItem(LS_KEYS.products)){
+      const sample = [
+        {id:1, title:'Футболка Chelsea Home 2025', price:11900, stock:25, desc:'Официальная домашняя футболка Chelsea 2025'},
+        {id:2, title:'Шарф Chelsea', price:3200, stock:40, desc:'Тёплый шарф болельщика'},
+        {id:3, title:'Кружка Chelsea', price:1800, stock:80, desc:'Керамическая кружка с эмблемой клуба'}
+      ];
+      localStorage.setItem(LS_KEYS.products, JSON.stringify(sample));
+    }
+    if(!localStorage.getItem(LS_KEYS.users)){
+      const sample = [
+        {id:1, name:'Аслан', email:'aslan@chelsea-fans.kz', role:'staff'},
+        {id:2, name:'Дина', email:'dina@chelsea-fans.kz', role:'staff'}
+      ];
+      localStorage.setItem(LS_KEYS.users, JSON.stringify(sample));
+    }
+    if(!localStorage.getItem(LS_KEYS.changes)){
+      localStorage.setItem(LS_KEYS.changes, JSON.stringify([]));
+    }
+  }
+
+  function read(key){ try{return JSON.parse(localStorage.getItem(key)||'null')}catch(e){return null} }
+  function write(key,val){ localStorage.setItem(key, JSON.stringify(val)); }
+  function pushChange(text){ const ch = read(LS_KEYS.changes)||[]; ch.unshift({id:Date.now(), text, date: new Date().toLocaleString()}); write(LS_KEYS.changes,ch.slice(0,50)); }
+
+  function useHashRoute(){ const [route, setRoute] = useState(window.location.hash.replace('#','')||'/'); useEffect(()=>{const onHash=()=>setRoute(window.location.hash.replace('#','')||'/'); window.addEventListener('hashchange', onHash); return ()=>window.removeEventListener('hashchange', onHash);},[]); return [route, (r)=>{window.location.hash = r}]; }
+
+  function useAuth(){ const [user,setUser] = useState(read(LS_KEYS.auth));
+    function login(username,password){ if(username===CREDENTIALS.username && password===CREDENTIALS.password){ const u = {username, loggedAt:Date.now()}; write(LS_KEYS.auth,u); setUser(u); pushChange('Вход администратора'); return true } return false }
+    function logout(){ localStorage.removeItem(LS_KEYS.auth); setUser(null); pushChange('Выход администратора'); }
+    return { user, login, logout } }
+
+  function App(){ seedIfEmpty(); const [route, navigate] = useHashRoute(); const auth = useAuth(); useEffect(()=>{ if(!auth.user && !['/login','/'].includes(route)) navigate('/login'); },[route, auth.user]);
+
+    return (
+      <div>
+        {!auth.user && route!=='/login' && (()=>{window.location.hash='/login'; return null})()}
+        {auth.user ? (
+          <div className="app">
+            <Sidebar navigate={navigate} onLogout={auth.logout} />
+            <div className="main">
+              <TopBar user={auth.user} />
+              <MainRouter route={route} navigate={navigate} pushChange={pushChange} />
+            </div>
+          </div>
+        ) : (
+          <div className="main">
+            <Login onLogin={(u,p)=>{const ok=auth.login(u,p); if(ok) window.location.hash='/'; return ok}} />
+          </div>
+        )}
+      </div>
+    )
+  }
+  const products = JSON.parse(localStorage.getItem("products")) || [];
+
+products.push({
+    name: title,
+    price: price,
+    image: imageURL,
+    description: desc
+});
+
+localStorage.setItem("products", JSON.stringify(products));
+
+
+  function Sidebar({navigate, onLogout}){
+    const links = [ ['/', 'Панель'], ['/products','Магазин'], ['/users','Пользователи'], ['/changes','Журнал'] ];
+    const current = window.location.hash.replace('#','')||'/';
+    return (
+      <aside className="sidebar">
+        <div className="brand">Chelsea Fan Admin</div>
+        <ul className="nav">
+          {links.map(([path,label])=> (
+            <li key={path}><a href={`#${path}`} className={current===path? 'active':''}>{label}</a></li>
+          ))}
+        </ul>
+        <div style={{marginTop:20}}> 
+          <button className="btn" onClick={()=>navigate('/products')}>Управлять магазином</button>
+        </div>
+        <div style={{position:'absolute', bottom:20, left:20, right:20}}>
+          <button className="btn ghost" onClick={()=>{onLogout(); window.location.hash='/login'}}>Выйти</button>
+        </div>
+      </aside>
+    )
+  }
+
+  function TopBar({user}){
+    return (
+      <div className="top">
+        <h2>Панель администратора — Chelsea Fan Site</h2>
+        <div className="small">Добро пожаловать, <strong>{user.username}</strong></div>
+      </div>
+    )
+  }
+
+  function MainRouter({route,navigate,pushChange}){
+    if(route==='/'||route==='') return <Dashboard navigate={navigate} />;
+    if(route==='/products') return <Products pushChange={pushChange} />;
+    if(route==='/users') return <Users pushChange={pushChange} />;
+    if(route==='/changes') return <Changes />;
+    return <div>Страница не найдена</div>;
+  }
+
+  function Login({onLogin}){
+    const [u,setU]=useState(''); const [p,setP]=useState(''); const [err,setErr]=useState('');
+    function submit(e){ e && e.preventDefault(); const ok = onLogin(u,p); if(!ok) setErr('Неверный логин или пароль'); }
+    return (
+      <div className="login-panel">
+        <h3>Вход в админ-панель Chelsea</h3>
+        <p className="small">Логин: <code>{CREDENTIALS.username}</code> / Пароль: <code>{CREDENTIALS.password}</code> (предопределённые)</p>
+        <form onSubmit={submit}>
+          <div className="form-row"><input value={u} onChange={e=>setU(e.target.value)} placeholder="Имя пользователя"/></div>
+          <div className="form-row"><input type="password" value={p} onChange={e=>setP(e.target.value)} placeholder="Пароль"/></div>
+          <div style={{display:'flex',gap:8}}>
+            <button className="btn" type="submit">Войти</button>
+            <!-- 🔹 Кнопка "Домой" -->
+<div style="text-align: center; margin-top: 15px;">
+    <a href="index.html" 
+       style="background-color: #003399; 
+              color: white; 
+              padding: 10px 20px; 
+              border-radius: 25px; 
+              text-decoration: none; 
+              font-weight: bold; 
+              transition: background 0.3s;">
+       ⬅️ Домой
+    </a>
+</div>
+            <button type="button" className="btn ghost" onClick={()=>{setU('');setP('');setErr('')}}>Очистить</button>
+          </div>
+        </form>
+        {err && <div style={{color:'#ff7b7b', marginTop:10}}>{err}</div>}
+      </div>
+      
+    )
+  }
+  
+
+  function Dashboard(){ const products = read(LS_KEYS.products)||[]; const users = read(LS_KEYS.users)||[]; const changes = read(LS_KEYS.changes)||[];
+    return (
+      <div>
+        <div className="card-grid">
+          <div className="card">
+            <div className="small">Товары</div>
+            <h3>{products.length}</h3>
+            <div className="small">Товаров в магазине Chelsea</div>
+          </div>
+          <div className="card">
+            <div className="small">Пользователи</div>
+            <h3>{users.length}</h3>
+            <div className="small">Зарегистрированные фанаты / сотрудники</div>
+          </div>
+          <div className="card">
+            <div className="small">Последние изменения</div>
+            <h3>{changes.slice(0,1).length}</h3>
+            <div className="small">Смотрите раздел "Журнал" для подробностей</div>
+          </div>
+        </div>
+
+        <div className="card" style={{marginBottom:12}}>
+          <h4>Краткий обзор последних изменений</h4>
+          <ul>
+            {(changes||[]).slice(0,6).map(c=> <li key={c.id} className="small">{c.date} — {c.text}</li>)}
+          </ul>
+        </div>
+
+        <div className="card">
+          <h4>Быстрые действия</h4>
+          <div style={{display:'flex', gap:10}}>
+            <button className="btn" onClick={()=>window.location.hash='/products'}>Перейти в магазин</button>
+            <button className="btn" onClick={()=>window.location.hash='/users'}>Управление пользователями</button>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  function Products({pushChange}){
+    const [items,setItems] = useState(read(LS_KEYS.products)||[]);
+    const [editing,setEditing] = useState(null);
+    const [q,setQ] = useState('');
+    useEffect(()=> write(LS_KEYS.products, items), [items]);
+
+    function add(item){ item.id = Date.now(); setItems([item, ...items]); pushChange(`Добавлен товар: ${item.title}`); }
+    function update(updated){ setItems(items.map(it=> it.id===updated.id? updated: it)); pushChange(`Отредактирован товар: ${updated.title}`); }
+    function remove(id){ const it = items.find(x=>x.id===id); setItems(items.filter(x=>x.id!==id)); pushChange(`Удалён товар: ${it?.title||id}`); }
+
+    const filtered = items.filter(it=> it.title.toLowerCase().includes(q.toLowerCase()));
+    return (
+      <div>
+        <div style={{display:'flex', justifyContent:'space-between', marginBottom:12}}>
+          <h3>Магазин Chelsea</h3>
+          <div style={{display:'flex', gap:8}}>
+            <input className="search" placeholder="Поиск" value={q} onChange={e=>setQ(e.target.value)} />
+            <button className="btn" onClick={()=>setEditing({})}>Добавить</button>
+          </div>
+        </div>
+
+        <div className="card">
+          <table>
+            <thead><tr><th>Название</th><th>Цена</th><th>В наличии</th><th>Действия</th></tr></thead>
+            <tbody>
+              {filtered.map(p=> (
+                <tr key={p.id}>
+                  <td>{p.title}</td>
+                  <td>{p.price} ₸</td>
+                  <td>{p.stock}</td>
+                  <td>
+                    <div className="table-actions">
+                      <button className="btn ghost" onClick={()=>setEditing(p)}>Изменить</button>
+                      <button className="btn" onClick={()=>{ if(confirm('Удалить товар?')) remove(p.id) }}>Удалить</button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        {editing !== null && <Modal onClose={()=>setEditing(null)}>
+          <ProductForm initial={editing} onCancel={()=>setEditing(null)} onSave={(data)=>{ if(data.id) update(data); else add(data); setEditing(null); }} />
+        </Modal>}
+      </div>
+    )
+  }
+
+  function ProductForm({initial, onSave, onCancel}){
+    const [title,setTitle] = useState(initial.title||'');
+    const [price,setPrice] = useState(initial.price||0);
+    const [stock,setStock] = useState(initial.stock||0);
+    const [desc,setDesc] = useState(initial.desc||'');
+    function submit(e){ e && e.preventDefault(); if(!title){alert('Введите название'); return;} onSave({ id: initial.id||null, title, price: Number(price), stock: Number(stock), desc }); }
+    return (
+      <form onSubmit={submit} style={{minWidth:380}}>
+        <h4>{initial.id? 'Редактировать товар':'Новый товар'}</h4>
+        <div className="form-row"><input value={title} onChange={e=>setTitle(e.target.value)} placeholder="Название"/></div>
+        <div className="form-row"><input value={price} onChange={e=>setPrice(e.target.value)} placeholder="Цена"/></div>
+        <div className="form-row"><input value={stock} onChange={e=>setStock(e.target.value)} placeholder="В наличии"/></div>
+        <div className="form-row"><textarea value={desc} onChange={e=>setDesc(e.target.value)} placeholder="Описание"></textarea></div>
+        <div style={{display:'flex', gap:8}}>
+          <button className="btn" type="submit">Сохранить</button>
+          <button type="button" className="btn ghost" onClick={onCancel}>Отмена</button>
+        </div>
+      </form>
+    )
+  }
+
+  function Users({pushChange}){
+    const [items,setItems] = useState(read(LS_KEYS.users)||[]);
+    const [editing,setEditing] = useState(null);
+    useEffect(()=> write(LS_KEYS.users, items), [items]);
+    function add(item){ item.id = Date.now(); setItems([item, ...items]); pushChange(`Добавлен пользователь: ${item.name}`); }
+    function update(u){ setItems(items.map(it=> it.id===u.id? u: it)); pushChange(`Отредактирован пользователь: ${u.name}`); }
+    function remove(id){ const it = items.find(x=>x.id===id); setItems(items.filter(x=>x.id!==id)); pushChange(`Удалён пользователь: ${it?.name||id}`); }
+
+    return (
+      <div>
+        <div style={{display:'flex', justifyContent:'space-between', marginBottom:12}}>
+          <h3>Пользователи / Сотрудники</h3>
+          <button className="btn" onClick={()=>setEditing({})}>Добавить пользователя</button>
+        </div>
+
+        <div className="card">
+          <table>
+            <thead><tr><th>Имя</th><th>Email</th><th>Роль</th><th>Действия</th></tr></thead>
+            <tbody>
+              {items.map(u=> (
+                <tr key={u.id}>
+                  <td>{u.name}</td>
+                  <td>{u.email}</td>
+                  <td>{u.role||'staff'}</td>
+                  <td>
+                    <div className="table-actions">
+                      <button className="btn ghost" onClick={()=>setEditing(u)}>Изменить</button>
+                      <button className="btn" onClick={()=>{ if(confirm('Удалить пользователя?')) remove(u.id) }}>Удалить</button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        {editing !== null && <Modal onClose={()=>setEditing(null)}>
+          <UserForm initial={editing} onCancel={()=>setEditing(null)} onSave={(data)=>{ if(data.id) update(data); else add(data); setEditing(null); }} />
+        </Modal>}
+      </div>
+    )
+  }
+
+  function UserForm({initial, onSave, onCancel}){
+    const [name,setName] = useState(initial.name||'');
+    const [email,setEmail] = useState(initial.email||'');
+    const [role,setRole] = useState(initial.role||'staff');
+    function submit(e){ e && e.preventDefault(); if(!name||!email){alert('Введите имя и email'); return;} onSave({ id: initial.id||null, name, email, role }); }
+    return (
+      <form onSubmit={submit} style={{minWidth:360}}>
+        <h4>{initial.id? 'Редактировать пользователя':'Новый пользователь'}</h4>
+        <div className="form-row"><input value={name} onChange={e=>setName(e.target.value)} placeholder="Имя"/></div>
+        <div className="form-row"><input value={email} onChange={e=>setEmail(e.target.value)} placeholder="Email"/></div>
+        <div className="form-row"><select value={role} onChange={e=>setRole(e.target.value)}><option value="staff">Сотрудник</option><option value="admin">Админ</option></select></div>
+        <div style={{display:'flex', gap:8}}>
+          <button className="btn" type="submit">Сохранить</button>
+          <button type="button" className="btn ghost" onClick={onCancel}>Отмена</button>
+        </div>
+      </form>
+    )
+  }
+  
+
+  function Changes(){ const changes = read(LS_KEYS.changes)||[]; return (
+    <div>
+      <h3>Журнал изменений</h3>
+      <div className="card">
+        <ul>
+          {changes.map(c=> <li key={c.id} className="small">{c.date} — {c.text}</li>)}
+        </ul>
+      </div>
+    </div>
+  ) }
+
+  function Modal({children, onClose}){
+    return (
+      <div style={{position:'fixed', inset:0, display:'flex', alignItems:'center', justifyContent:'center', background:'rgba(0,0,0,0.55)'}} onClick={onClose}>
+        <div style={{minWidth:320, maxWidth:720}} onClick={e=>e.stopPropagation()}>
+          <div className="card">{children}</div>
+        </div>
+      </div>
+    )
+  }
+  
+
+  ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+<script type="text/babel">
+  // код админки
+</script>
+
+  <script>
+    console.info('Chelsea admin panel loaded. To integrate place this file at /admin/index.html and link to it from your site.');
+  </script>
+</body>
+</html>

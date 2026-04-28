@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Регистрация | Chelsea Fan Club</title>
+<style>
+body {
+    background: linear-gradient(180deg, #001a66, #0044cc);
+    font-family: 'Segoe UI', sans-serif;
+    color: white;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.form-container {
+    background-color: rgba(255,255,255,0.1);
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 0 20px rgba(255,255,255,0.2);
+    width: 340px;
+    text-align: center;
+}
+
+h2 {
+    margin-bottom: 20px;
+    color: #ffd700;
+}
+
+input {
+    width: 90%;
+    padding: 10px;
+    margin: 8px 0;
+    border: none;
+    border-radius: 8px;
+    outline: none;
+}
+
+button {
+    background-color: #ffd700;
+    color: #001a66;
+    border: none;
+    padding: 10px 25px;
+    border-radius: 25px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: all 0.3s;
+}
+
+button:hover {
+    background-color: #ffea70;
+    transform: scale(1.05);
+}
+
+.back-btn {
+    display: inline-block;
+    margin-top: 15px;
+    color: #ffd700;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.back-btn:hover {
+    color: #fff;
+}
+
+.error {
+    color: red;
+    font-size: 14px;
+}
+.success {
+    color: lightgreen;
+    font-size: 16px;
+}
+</style>
+</head>
+<body>
+
+<div class="form-container">
+    <h2>Регистрация</h2>
+    <form id="registerForm">
+        <input type="text" id="fullName" placeholder="Полное имя" required><br>
+        <input type="email" id="email" placeholder="Электронная почта" required><br>
+        <input type="password" id="password" placeholder="Пароль" required><br>
+        <input type="password" id="confirmPassword" placeholder="Подтвердите пароль" required><br>
+        <button type="button" onclick="submitForm()">Зарегистрироваться</button>
+    </form>
+
+    <p id="message"></p>
+
+    <a href="index.html" class="back-btn">⬅️ Назад на главную</a>
+</div>
+
+<script>
+function submitForm() {
+    const fullName = document.getElementById("fullName").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value;
+    const confirmPassword = document.getElementById("confirmPassword").value;
+    const messageEl = document.getElementById("message");
+
+    messageEl.innerHTML = ""; // очищаем
+
+    if (!fullName || !email || !password || !confirmPassword) {
+        messageEl.innerHTML = "<span class='error'>❌ Все поля должны быть заполнены!</span>";
+        return;
+    }
+
+    if (password.length < 6) {
+        messageEl.innerHTML = "<span class='error'>❌ Пароль должен быть минимум 6 символов!</span>";
+        return;
+    }
+
+    if (password !== confirmPassword) {
+        messageEl.innerHTML = "<span class='error'>❌ Пароли не совпадают!</span>";
+        return;
+    }
+
+    // Создаём объект пользователя
+    const newUser = {
+        name: fullName,
+        email: email,
+        password: password,
+    };
+
+    // Сохраняем в LocalStorage
+    let users = JSON.parse(localStorage.getItem("chelsea_users")) || [];
+    users.push(newUser);
+    localStorage.setItem("chelsea_users", JSON.stringify(users));
+
+    // Показываем сообщение
+    messageEl.innerHTML = "<span class='success'>✔ Успешная регистрация!</span>";
+
+    // Через 1.5 сек переходим на страницу входа
+    setTimeout(() => {
+        window.location.href = "login.html";
+    }, 1500);
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>АПЛ — Таблица | Chelsea FC</title>
+
+<style>
+/* ================= RESET ================= */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Inter, Arial, sans-serif;
+}
+
+body {
+  background: #0e1621;
+  color: #e5e5e5;
+}
+
+/* ================= HEADER ================= */
+.fs-header {
+  background: #111c2e;
+  padding: 15px 30px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #1f2a40;
+}
+
+.fs-header h1 {
+  color: #ffd700;
+  font-size: 22px;
+}
+
+.fs-header a {
+  color: #9fb3ff;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.fs-header a:hover {
+  text-decoration: underline;
+}
+
+/* ================= LAYOUT ================= */
+.fs-container {
+  max-width: 1100px;
+  margin: 20px auto;
+  background: #111c2e;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* ================= LEAGUE HEADER ================= */
+.league-header {
+  padding: 16px 20px;
+  background: #0c1424;
+  border-bottom: 1px solid #1f2a40;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.league-header img {
+  width: 28px;
+}
+
+.league-header h2 {
+  font-size: 18px;
+}
+
+/* ================= TABS ================= */
+.tabs {
+  display: flex;
+  background: #0c1424;
+  border-bottom: 1px solid #1f2a40;
+}
+
+.tab {
+  padding: 14px 20px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #9fb3ff;
+  border-bottom: 3px solid transparent;
+}
+
+.tab.active {
+  color: #ffd700;
+  border-bottom: 3px solid #ffd700;
+}
+
+/* ================= TABLE ================= */
+.table-wrapper {
+  padding: 10px 0;
+}
+
+.fs-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.fs-table th {
+  font-size: 12px;
+  font-weight: 500;
+  color: #9fb3ff;
+  padding: 10px;
+  text-align: center;
+}
+
+.fs-table td {
+  padding: 12px 10px;
+  font-size: 14px;
+  text-align: center;
+  border-top: 1px solid #1f2a40;
+}
+
+.fs-table tr:hover {
+  background: #16233d;
+}
+
+/* ===== team column ===== */
+.team {
+  text-align: left !important;
+  padding-left: 20px;
+}
+
+/* ================= CHELSEA ================= */
+.chelsea {
+  background: #034694;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.chelsea:hover {
+  background: #022f5b;
+}
+
+/* ================= MODAL ================= */
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: 0.3s;
+  z-index: 2000;
+}
+
+.modal.active {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.modal-box {
+  background: #111c2e;
+  width: 420px;
+  border-radius: 8px;
+  padding: 20px;
+}
+
+.modal-box h3 {
+  color: #ffd700;
+  margin-bottom: 15px;
+}
+
+.modal-box ul {
+  list-style: none;
+}
+
+.modal-box li {
+  padding: 10px 0;
+  border-bottom: 1px solid #1f2a40;
+  font-size: 14px;
+}
+
+.close {
+  float: right;
+  cursor: pointer;
+  color: #9fb3ff;
+}
+
+/* ================= FOOTER ================= */
+.fs-footer {
+  text-align: center;
+  padding: 20px;
+  font-size: 12px;
+  color: #9fb3ff;
+}
+</style>
+</head>
+
+<body>
+
+<!-- HEADER -->
+<div class="fs-header">
+  <h1>Chelsea World</h1>
+  <a href="index.html">← На главную</a>
+</div>
+
+<!-- MAIN -->
+<div class="fs-container">
+
+  <!-- LEAGUE -->
+  <div class="league-header">
+    <img src="https://upload.wikimedia.org/wikipedia/en/f/f2/Premier_League_Logo.svg">
+    <h2>Premier League — Таблица</h2>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <div class="tab active">Таблица</div>
+    <div class="tab">Матчи</div>
+    <div class="tab">Команды</div>
+    <div class="tab">Статистика</div>
+  </div>
+
+  <!-- TABLE -->
+  <div class="table-wrapper">
+    <table class="fs-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th class="team">Команда</th>
+          <th>И</th>
+          <th>О</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal" id="modal">
+  <div class="modal-box">
+    <span class="close" id="close">✕</span>
+    <h3>Последние матчи Chelsea</h3>
+    <ul id="matches"></ul>
+  </div>
+</div>
+
+<div class="fs-footer">
+  Дизайн в стиле FlashScore • Chelsea Theme
+</div>
+
+<script>
+const teams = [
+  ["1","Manchester City",38,91],
+  ["2","Arsenal",38,89],
+  ["3","Liverpool",38,82],
+  ["4","Aston Villa",38,68],
+  ["5","Tottenham",38,66],
+  ["6","Chelsea",38,63],
+  ["7","Newcastle",38,60],
+  ["8","Man United",38,58],
+  ["9","West Ham",38,52],
+  ["10","Brighton",38,50],
+  ["11","Wolves",38,47],
+  ["12","Crystal Palace",38,45],
+  ["13","Fulham",38,44],
+  ["14","Bournemouth",38,41],
+  ["15","Brentford",38,39]
+];
+
+
+const matches = [
+  "Chelsea 2–1 Arsenal",
+  "Liverpool 1–1 Chelsea",
+  "Chelsea 3–0 Everton",
+  "Man City 2–1 Chelsea",
+  "Chelsea 2–0 West Ham"
+];
+
+const body = document.getElementById("tableBody");
+const modal = document.getElementById("modal");
+
+teams.forEach(t => {
+  const tr = document.createElement("tr");
+  if (t[1] === "Chelsea") {
+    tr.className = "chelsea";
+    tr.onclick = () => modal.classList.add("active");
+  }
+  tr.innerHTML = `
+    <td>${t[0]}</td>
+    <td class="team">${t[1]}</td>
+    <td>${t[2]}</td>
+    <td>${t[3]}</td>
+  `;
+  body.appendChild(tr);
+});
+
+const ul = document.getElementById("matches");
+matches.forEach(m => {
+  const li = document.createElement("li");
+  li.textContent = m;
+  ul.appendChild(li);
+});
+
+document.getElementById("close").onclick = () => {
+  modal.classList.remove("active");
+};
+
+modal.onclick = e => {
+  if (e.target === modal) modal.classList.remove("active");
+};
+</script>
+
+</body>
+</html>
