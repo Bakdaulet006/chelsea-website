@@ -356,6 +356,107 @@ function showOnScroll() {
 window.addEventListener('scroll', showOnScroll);
 showOnScroll();
 </script>
+```html
+<!-- Chat Button -->
+<div id="chat-button">💬</div>
+
+<!-- Chat Box -->
+<div id="chat-box">
+  <div id="chat-header">Chelsea AI Chat</div>
+  <div id="chat-messages"></div>
+
+  <input type="text" id="user-input" placeholder="Type message..." />
+  <button onclick="sendMessage()">Send</button>
+</div>
+
+<style>
+#chat-button {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: blue;
+  color: white;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  font-size: 30px;
+}
+
+#chat-box {
+  display: none;
+  position: fixed;
+  bottom: 90px;
+  right: 20px;
+  width: 300px;
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+#chat-header {
+  background: blue;
+  color: white;
+  padding: 10px;
+}
+
+#chat-messages {
+  height: 250px;
+  padding: 10px;
+  overflow-y: auto;
+}
+
+#user-input {
+  width: 70%;
+  padding: 10px;
+}
+
+button {
+  width: 25%;
+  padding: 10px;
+}
+</style>
+
+<script>
+const chatButton = document.getElementById("chat-button");
+const chatBox = document.getElementById("chat-box");
+
+chatButton.onclick = () => {
+  chatBox.style.display =
+    chatBox.style.display === "block" ? "none" : "block";
+};
+
+function sendMessage() {
+  const input = document.getElementById("user-input");
+  const messages = document.getElementById("chat-messages");
+
+  const userText = input.value;
+
+  if (userText.trim() === "") return;
+
+  messages.innerHTML += `<p><b>You:</b> ${userText}</p>`;
+
+  let botReply = "I am Chelsea bot 💙";
+
+  if (userText.toLowerCase().includes("chelsea")) {
+    botReply = "Chelsea is the best football club!";
+  }
+
+  if (userText.toLowerCase().includes("hello")) {
+    botReply = "Hello friend 👋";
+  }
+
+  messages.innerHTML += `<p><b>Bot:</b> ${botReply}</p>`;
+
+  input.value = "";
+}
+</script>
+```
 
 </body>
 </html>
+
