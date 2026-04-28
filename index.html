@@ -355,15 +355,125 @@ function showOnScroll() {
 }
 window.addEventListener('scroll', showOnScroll);
 showOnScroll();
-</script>
-<input id="msg" placeholder="Жаз..." />
-<button onclick="send()">Жіберу</button>
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+<meta charset="UTF-8" />
+<title>Chat Bot</title>
 
-<div id="chat"></div>
+<style>
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: #0f172a;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+    }
+
+    .chat-container {
+        width: 400px;
+        height: 600px;
+        background: #111827;
+        border-radius: 15px;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+
+    .chat-header {
+        background: #2563eb;
+        color: white;
+        padding: 15px;
+        text-align: center;
+        font-weight: bold;
+    }
+
+    #chat {
+        flex: 1;
+        padding: 10px;
+        overflow-y: auto;
+    }
+
+    .msg {
+        margin: 8px 0;
+        padding: 10px;
+        border-radius: 10px;
+        max-width: 80%;
+        word-wrap: break-word;
+    }
+
+    .user {
+        background: #22c55e;
+        color: white;
+        margin-left: auto;
+        text-align: right;
+    }
+
+    .bot {
+        background: #374151;
+        color: white;
+        margin-right: auto;
+    }
+
+    .input-area {
+        display: flex;
+        padding: 10px;
+        background: #1f2937;
+    }
+
+    input {
+        flex: 1;
+        padding: 10px;
+        border: none;
+        border-radius: 8px;
+        outline: none;
+    }
+
+    button {
+        margin-left: 8px;
+        padding: 10px 15px;
+        border: none;
+        border-radius: 8px;
+        background: #2563eb;
+        color: white;
+        cursor: pointer;
+    }
+
+    button:hover {
+        background: #1d4ed8;
+    }
+</style>
+</head>
+
+<body>
+
+<div class="chat-container">
+    <div class="chat-header">💬 My Chat Bot</div>
+
+    <div id="chat"></div>
+
+    <div class="input-area">
+        <input id="msg" placeholder="Жаз..." />
+        <button onclick="send()">Жіберу</button>
+    </div>
+</div>
 
 <script>
 async function send() {
-    const message = document.getElementById("msg").value;
+    const input = document.getElementById("msg");
+    const message = input.value;
+
+    if (!message) return;
+
+    const chat = document.getElementById("chat");
+
+    // user message
+    chat.innerHTML += `<div class="msg user">${message}</div>`;
+
+    input.value = "";
 
     const res = await fetch("https://bakdaulet.daurenbakdaulet077.workers.dev", {
         method: "POST",
@@ -375,13 +485,15 @@ async function send() {
 
     const data = await res.json();
 
-    document.getElementById("chat").innerHTML += `
-        <p><b>Сен:</b> ${message}</p>
-        <p><b>Bot:</b> ${data.reply}</p>
-        <hr>
-    `;
+    // bot message
+    chat.innerHTML += `<div class="msg bot">${data.reply}</div>`;
+
+    chat.scrollTop = chat.scrollHeight;
 }
 </script>
+
+</body>
+</html>
 </body>
 </html>
 
