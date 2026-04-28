@@ -355,145 +355,162 @@ function showOnScroll() {
 }
 window.addEventListener('scroll', showOnScroll);
 showOnScroll();
-<!DOCTYPE html>
-<html lang="kk">
-<head>
-<meta charset="UTF-8" />
-<title>Chat Bot</title>
+<!-- Chat Button -->
+<div id="chat-button">💬</div>
 
-<style>
-    body {
-        margin: 0;
-        font-family: Arial, sans-serif;
-        background: #0f172a;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-    }
+<!-- Chat Box -->
+<div id="chat-box">
+  <div id="chat-header">Chelsea AI Chat 💙</div>
 
-    .chat-container {
-        width: 400px;
-        height: 600px;
-        background: #111827;
-        border-radius: 15px;
-        display: flex;
-        flex-direction: column;
-        overflow: hidden;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-    }
+  <div id="chat-messages"></div>
 
-    .chat-header {
-        background: #2563eb;
-        color: white;
-        padding: 15px;
-        text-align: center;
-        font-weight: bold;
-    }
-
-    #chat {
-        flex: 1;
-        padding: 10px;
-        overflow-y: auto;
-    }
-
-    .msg {
-        margin: 8px 0;
-        padding: 10px;
-        border-radius: 10px;
-        max-width: 80%;
-        word-wrap: break-word;
-    }
-
-    .user {
-        background: #22c55e;
-        color: white;
-        margin-left: auto;
-        text-align: right;
-    }
-
-    .bot {
-        background: #374151;
-        color: white;
-        margin-right: auto;
-    }
-
-    .input-area {
-        display: flex;
-        padding: 10px;
-        background: #1f2937;
-    }
-
-    input {
-        flex: 1;
-        padding: 10px;
-        border: none;
-        border-radius: 8px;
-        outline: none;
-    }
-
-    button {
-        margin-left: 8px;
-        padding: 10px 15px;
-        border: none;
-        border-radius: 8px;
-        background: #2563eb;
-        color: white;
-        cursor: pointer;
-    }
-
-    button:hover {
-        background: #1d4ed8;
-    }
-</style>
-</head>
-
-<body>
-
-<div class="chat-container">
-    <div class="chat-header">💬 My Chat Bot</div>
-
-    <div id="chat"></div>
-
-    <div class="input-area">
-        <input id="msg" placeholder="Жаз..." />
-        <button onclick="send()">Жіберу</button>
-    </div>
+  <div id="input-area">
+    <input type="text" id="user-input" placeholder="Type message..." />
+    <button onclick="sendMessage()">Send</button>
+  </div>
 </div>
 
+<style>
+body {
+  font-family: Arial;
+}
+
+/* button */
+#chat-button {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: #1d4ed8;
+  color: white;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  font-size: 28px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+/* chat box */
+#chat-box {
+  display: none;
+  position: fixed;
+  bottom: 90px;
+  right: 20px;
+  width: 320px;
+  background: #0f172a;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+}
+
+/* header */
+#chat-header {
+  background: #1d4ed8;
+  color: white;
+  padding: 12px;
+  font-weight: bold;
+}
+
+/* messages */
+#chat-messages {
+  height: 300px;
+  padding: 10px;
+  overflow-y: auto;
+  background: #111827;
+}
+
+.msg {
+  margin: 6px 0;
+  padding: 8px 10px;
+  border-radius: 10px;
+  max-width: 80%;
+  word-wrap: break-word;
+  color: white;
+}
+
+.user {
+  background: #22c55e;
+  margin-left: auto;
+  text-align: right;
+}
+
+.bot {
+  background: #374151;
+  margin-right: auto;
+}
+
+/* input */
+#input-area {
+  display: flex;
+  background: #1f2937;
+  padding: 8px;
+}
+
+#user-input {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  border-radius: 8px;
+  outline: none;
+}
+
+button {
+  margin-left: 8px;
+  padding: 10px;
+  border: none;
+  border-radius: 8px;
+  background: #2563eb;
+  color: white;
+  cursor: pointer;
+}
+</style>
+
 <script>
-async function send() {
-    const input = document.getElementById("msg");
-    const message = input.value;
+const chatButton = document.getElementById("chat-button");
+const chatBox = document.getElementById("chat-box");
 
-    if (!message) return;
+chatButton.onclick = () => {
+  chatBox.style.display =
+    chatBox.style.display === "block" ? "none" : "block";
+};
 
-    const chat = document.getElementById("chat");
+async function sendMessage() {
+  const input = document.getElementById("user-input");
+  const messages = document.getElementById("chat-messages");
 
-    // user message
-    chat.innerHTML += `<div class="msg user">${message}</div>`;
+  const text = input.value;
+  if (!text.trim()) return;
 
-    input.value = "";
+  // user message
+  messages.innerHTML += `<div class="msg user">${text}</div>`;
+  input.value = "";
 
+  // scroll
+  messages.scrollTop = messages.scrollHeight;
+
+  try {
     const res = await fetch("https://bakdaulet.daurenbakdaulet077.workers.dev", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ message })
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ message: text })
     });
 
     const data = await res.json();
 
     // bot message
-    chat.innerHTML += `<div class="msg bot">${data.reply}</div>`;
+    messages.innerHTML += `<div class="msg bot">${data.reply}</div>`;
+    messages.scrollTop = messages.scrollHeight;
 
-    chat.scrollTop = chat.scrollHeight;
+  } catch (err) {
+    messages.innerHTML += `<div class="msg bot">Error connecting AI ❌</div>`;
+  }
 }
 </script>
-
-</body>
-</html>
 </body>
 </html>
 
