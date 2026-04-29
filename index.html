@@ -513,7 +513,13 @@ async function sendMessage() {
   messages.scrollTop = messages.scrollHeight;
 
   try {
-    const res = await fetch("https://api.chucknorris.io/jokes/random"); // ТЕСТ API
+    const res = await fetch("https://YOUR-WORKER.workers.dev", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify({ message: text })
+}); // ТЕСТ API
     const data = await res.json();
 
     const reply = data.value; // жауап
