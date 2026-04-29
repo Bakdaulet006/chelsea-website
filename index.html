@@ -363,174 +363,83 @@ showOnScroll();
 <title>AI Chat</title>
 
 <style>
-body { font-family: Arial; }
+body { font-family: Arial; background:#0f172a; color:white; display:flex; justify-content:center; padding-top:30px; }
 
-/* button */
-#chat-button {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  background: #1d4ed8;
-  color: white;
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  cursor: pointer;
-  font-size: 28px;
-}
+#box { width:360px; background:#111827; padding:10px; border-radius:10px; }
 
-/* chat box */
-#chat-box {
-  display: none;
-  position: fixed;
-  bottom: 90px;
-  right: 20px;
-  width: 320px;
-  background: #0f172a;
-  border-radius: 12px;
-  overflow: hidden;
-}
+.msg { margin:5px 0; padding:8px; border-radius:8px; }
+.user { background:#22c55e; text-align:right; }
+.bot { background:#374151; }
 
-/* header */
-#chat-header {
-  background: #1d4ed8;
-  color: white;
-  padding: 12px;
-}
-
-/* messages */
-#chat-messages {
-  height: 300px;
-  padding: 10px;
-  overflow-y: auto;
-  background: #111827;
-}
-
-.msg {
-  margin: 6px 0;
-  padding: 8px;
-  border-radius: 10px;
-  color: white;
-  max-width: 80%;
-}
-
-.user { background: #22c55e; margin-left: auto; }
-.bot { background: #374151; }
-
-/* input */
-#input-area {
-  display: flex;
-  padding: 8px;
-  background: #1f2937;
-}
-
-#user-input {
-  flex: 1;
-  padding: 10px;
-  border: none;
-  border-radius: 8px;
-}
-
-button {
-  margin-left: 5px;
-  padding: 10px;
-  border: none;
-  border-radius: 8px;
-  background: #2563eb;
-  color: white;
-  cursor: pointer;
-}
+input { width:70%; padding:10px; }
+button { padding:10px; background:#2563eb; color:white; border:none; }
 </style>
 </head>
 
 <body>
 
-<div id="chat-button">💬</div>
+<div id="box">
+  <div id="messages"></div>
 
-<div id="chat-box">
-  <div id="chat-header">AI Chat 🤖</div>
-  <div id="chat-messages"></div>
-
-  <div id="input-area">
-    <input type="text" id="user-input" placeholder="Жаз..." />
-    <button onclick="startVoice()">🎤</button>
-    <button onclick="sendMessage()">Send</button>
-  </div>
+  <input id="text" placeholder="жаз..." />
+  <button onclick="voice()">🎤</button>
+  <button onclick="send()">Send</button>
 </div>
 
 <script>
-const chatButton = document.getElementById("chat-button");
-const chatBox = document.getElementById("chat-box");
 
-chatButton.onclick = () => {
-  chatBox.style.display =
-    chatBox.style.display === "block" ? "none" : "block";
-};
-
-// 🎤 VOICE INPUT
-function startVoice() {
-  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-
-  if (!SpeechRecognition) {
-    alert("Браузер voice қолдамайды ❌");
-    return;
-  }
-
-  const recognition = new SpeechRecognition();
-  recognition.lang = "kk-KZ";
-  recognition.start();
-
-  recognition.onresult = function(event) {
-    const text = event.results[0][0].transcript;
-    document.getElementById("user-input").value = text;
-  };
-
-  recognition.onerror = function() {
-    alert("Mic error ❌");
-  };
-}
+// 🔴 ОСЫ ЖЕРГЕ ӨЗ API KEY ҚОЯСЫҢ
+const API_KEY = "AIzaSyAcMfTCkH4Eibj0Mlpa1hshydUdG8jU_iM";
 
 // 🔊 SPEAK
-function speak(text) {
-  const speech = new SpeechSynthesisUtterance(text);
-  speech.lang = "kk-KZ";
-  speech.rate = 1;
-  window.speechSynthesis.speak(speech);
+function speak(text){
+  const s = new SpeechSynthesisUtterance(text);
+  s.lang = "kk-KZ";
+  speechSynthesis.speak(s);
 }
 
-// 💬 SEND MESSAGE
-async function sendMessage() {
-  const input = document.getElementById("user-input");
-  const messages = document.getElementById("chat-messages");
+// 🎤 VOICE
+function voice(){
+  const r = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+  r.lang = "kk-KZ";
+  r.start();
 
-  const text = input.value;
-  if (!text.trim()) return;
-
-  messages.innerHTML += `<div class="msg user">${text}</div>`;
-  input.value = "";
-  messages.scrollTop = messages.scrollHeight;
-
-  try {
-    const res = await fetch("https://YOUR-WORKER.workers.dev", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message: text })
-    });
-
-    const data = await res.json();
-    const reply = data.reply || "Жауап жоқ 😅";
-
-    messages.innerHTML += `<div class="msg bot">${reply}</div>`;
-    speak(reply);
-
-    messages.scrollTop = messages.scrollHeight;
-
-  } catch (err) {
-    messages.innerHTML += `<div class="msg bot">Server error ❌</div>`;
+  r.onresult = e=>{
+    document.getElementById("text").value =
+    e.results[0][0].transcript;
   }
+}
+
+// 💬 SEND
+async function send(){
+  const input = document.getElementById("text");
+  const msg = input.value;
+  if(!msg) return;
+
+  const box = document.getElementById("messages");
+
+  box.innerHTML += `<div class="msg user">${msg}</div>`;
+  input.value="";
+
+  const res = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${API_KEY}`,
+    {
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({
+        contents:[{parts:[{text:msg}]}]
+      })
+    }
+  );
+
+  const data = await res.json();
+
+  const reply =
+    data.candidates?.[0]?.content?.parts?.[0]?.text
+    || "Жауап жоқ 😅";
+
+  box.innerHTML += `<div class="msg bot">${reply}</div>`;
+  speak(reply);
 }
 </script>
 
