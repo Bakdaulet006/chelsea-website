@@ -533,6 +533,39 @@ function escapeHtml(str) {
   });
 }
 </script>
+  <script type="module">
+    import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+
+    // ТӨМЕНДЕГІ ЕКІ ЖОЛДЫ ӨЗІҢІЗДІҢ МӘЛІМЕТТЕРІҢІЗБЕН АУЫСТЫРЫҢЫЗ
+    const supabaseUrl = 'https://lxgcbasmwolbbggunaww.supabase.co'
+    const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx4Z2NiYXNtd29sYmJnZ3VuYXd3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc0NjAwOTksImV4cCI6MjA5MzAzNjA5OX0.NXQXKwxku9IEr5IF9QBkxtw0j4XM5C5ysmFIvagPeCg'
+
+    const supabase = createClient(supabaseUrl, supabaseAnonKey)
+
+    async function showData() {
+        const { data, error } = await supabase
+            .from('User,Password')   // МЫНДА ӨЗ КЕСТЕҢІЗДІҢ АТЫН ЖАЗЫҢЫЗ
+            .select('*')
+
+        const listElement = document.getElementById('data-list')
+        
+        if (error) {
+            listElement.innerHTML = `<li>Қате: ${error.message}</li>`
+            console.error('Қате:', error)
+            return
+        }
+
+        if (data && data.length > 0) {
+            listElement.innerHTML = data.map(item => 
+                `<li>ID: ${item.id} - ${item.name}</li>`
+            ).join('')
+        } else {
+            listElement.innerHTML = '<li>Деректер жоқ</li>'
+        }
+    }
+
+    showData()
+</script>
 </body>
 </html>
 
