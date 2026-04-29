@@ -357,7 +357,7 @@ window.addEventListener('scroll', showOnScroll);
 showOnScroll();
 </script>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="kk">
 <head>
 <meta charset="UTF-8">
 <title>AI Chat</title>
@@ -417,14 +417,8 @@ body { font-family: Arial; }
   max-width: 80%;
 }
 
-.user {
-  background: #22c55e;
-  margin-left: auto;
-}
-
-.bot {
-  background: #374151;
-}
+.user { background: #22c55e; margin-left: auto; }
+.bot { background: #374151; }
 
 /* input */
 #input-area {
@@ -461,7 +455,7 @@ button {
   <div id="chat-messages"></div>
 
   <div id="input-area">
-    <input type="text" id="user-input" placeholder="Type message..." />
+    <input type="text" id="user-input" placeholder="Жаз..." />
     <button onclick="startVoice()">🎤</button>
     <button onclick="sendMessage()">Send</button>
   </div>
@@ -478,9 +472,15 @@ chatButton.onclick = () => {
 
 // 🎤 VOICE INPUT
 function startVoice() {
-  const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
-  recognition.lang = "ru-RU"; // kk-KZ болса да болады
+  if (!SpeechRecognition) {
+    alert("Браузер voice қолдамайды ❌");
+    return;
+  }
+
+  const recognition = new SpeechRecognition();
+  recognition.lang = "kk-KZ";
   recognition.start();
 
   recognition.onresult = function(event) {
@@ -496,7 +496,8 @@ function startVoice() {
 // 🔊 SPEAK
 function speak(text) {
   const speech = new SpeechSynthesisUtterance(text);
-  speech.lang = "ru-RU";
+  speech.lang = "kk-KZ";
+  speech.rate = 1;
   window.speechSynthesis.speak(speech);
 }
 
@@ -514,15 +515,13 @@ async function sendMessage() {
 
   try {
     const res = await fetch("https://YOUR-WORKER.workers.dev", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json"
-  },
-  body: JSON.stringify({ message: text })
-}); // ТЕСТ API
-    const data = await res.json();
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message: text })
+    });
 
-    const reply = data.value; // жауап
+    const data = await res.json();
+    const reply = data.reply || "Жауап жоқ 😅";
 
     messages.innerHTML += `<div class="msg bot">${reply}</div>`;
     speak(reply);
@@ -530,7 +529,7 @@ async function sendMessage() {
     messages.scrollTop = messages.scrollHeight;
 
   } catch (err) {
-    messages.innerHTML += `<div class="msg bot">Error ❌</div>`;
+    messages.innerHTML += `<div class="msg bot">Server error ❌</div>`;
   }
 }
 </script>
